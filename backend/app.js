@@ -12,12 +12,51 @@ dotenv.config();
 
 const app=express();
 
+const allowedOrigins = [process.env.CLIENT_URL];
+
 process.on('uncaughtException', function (err) {
     console.log(err);
   });
 
+// CORS middleware for preflight requests:
+const corsSetting = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH' , 'DELETE'], 
+  allowedHeaders: ['Content-Type', 'Authorization'], 
+  credentials: true 
+};
 
-app.use(cors({origin:process.env.CLIENT_URL, credentials: true}))
+app.options('*', cors(corsSetting));
+
+// CORS middleware to handle requests
+app.use(cors(corsSetting));
+
+
+// Error handling middleware for CORS errors
+app.use((err, req, res, next) => {
+  if (err.name === 'CORSError') {
+    res.status(403).json({ error: 'CORS error: ' + err.message });
+  } else {
+    next(err);
+  }
+});
+
+// Application-level middleware for setting Access-Control-Allow-Origin header:
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  next();
+});
+
+
 app.use(cookieParser())
 app.use(express.json())
 
