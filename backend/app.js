@@ -12,7 +12,7 @@ dotenv.config();
 
 const app=express();
 
-const allowedOrigins = [process.env.CLIENT_URL];
+const allowedOrigins = ["http://localhost:5173"];
 
 process.on('uncaughtException', function (err) {
     console.log(err);
