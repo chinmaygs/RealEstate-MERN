@@ -1,7 +1,8 @@
 import axios from "axios";
+axios.defaults.withCredentials = true;
 
 const apiRequest = axios.create({
-    baseURL:"http://localhost:8000/api",
+    baseURL:"https://realestate-mern-nt9u.onrender.com",
     withCredentials: true,
 });
 
